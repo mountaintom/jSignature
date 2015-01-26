@@ -65,6 +65,11 @@
 	<div id="tools"></div>
 	<div><p>Display Area:</p><div id="displayarea"></div></div>
 </div>
+<fieldset>
+<legend>Test (visible) Canvas for rendering.</legend>
+<div id='RITest'>test div</div>
+</fieldset>
+
 <div id="scrollgrabber"></div>
 </div>
 <script src="../libs/jquery.js"></script>
@@ -115,6 +120,7 @@ http://dojofoundation.org/license for more information.
 <script src="../src/jSignature.js"></script>
 <script src="../src/plugins/jSignature.CompressorBase30.js"></script>
 <script src="../src/plugins/jSignature.CompressorSVG.js"></script>
+<script src="../src/plugins/jSignature.CompressorRenderedImage.js"></script>
 <script src="../src/plugins/jSignature.UndoButton.js"></script> 
 <script src="../src/plugins/signhere/jSignature.SignHere.js"></script> 
 <script>
@@ -203,7 +209,13 @@ $(document).ready(function() {
 	$.subscribe(pubsubprefix + 'image/png;base64', function(data) {
 		var i = new Image()
 		i.src = 'data:' + data[0] + ',' + data[1]
-		$('<span><b>As you can see, one of the problems of "image" extraction (besides not working on some old Androids, elsewhere) is that it extracts A LOT OF DATA and includes all the decoration that is not part of the signature.</b></span>').appendTo($extraarea)
+		$('<span><b>This is the native or rendered PNG Image</b></span>').appendTo($extraarea)
+		$(i).appendTo($extraarea)
+	});
+	$.subscribe(pubsubprefix + 'image/jpeg;base64', function(data) {
+		var i = new Image()
+		i.src = 'data:' + data[0] + ',' + data[1]
+		$('<span><b>This is a rendered JPEG Image</b></span>').appendTo($extraarea)
 		$(i).appendTo($extraarea)
 	});
 	

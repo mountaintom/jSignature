@@ -1,14 +1,14 @@
 # jSignature
 
-==========
-
+----------
+## This Project 
 This project creates a plug-in to render JPEG and PNG images from vectors just like the back-end process except it does so in JavaScript on the client.
 
 Modern Mobile App platforms and browsers have the capability to render the signatures to images directly. The plug-in created in this project does that. The plug-in renders an image independent of the jSignature capture size and without the decorations. 
 
 In the examples directory the unmini.html demo file has been modified to demonstrate this new plug-in.
 
-==========
+----------
 
 jSignature is a jQuery plugin which simplifies creation of a signature capture field in the browser window, allowing a user to draw a signature using mouse, pen, or finger.
 

@@ -10,6 +10,8 @@ In the examples directory the unmini.html demo file has been modified to demonst
 
 --Tom   mtm{removethis}@mountaintom.com
 
+Also see: https://github.com/mountaintom/jSignature-Jpeg-PNG-Plugin
+
 ----------
 
 jSignature is a jQuery plugin which simplifies creation of a signature capture field in the browser window, allowing a user to draw a signature using mouse, pen, or finger.

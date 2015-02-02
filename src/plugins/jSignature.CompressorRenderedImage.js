@@ -9,20 +9,19 @@ MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
 
 /*
- Plugin to allow modern browsers to render vectors to an image directly, without the need to do this through backend code.
+ Plugin to allow modern browsers to render vectors to an image directly, without the need to do this through back-end code.
  This plugin is primarily intended for Mobile Apps and other situations where modern browsers are used.
 
  This plugin will render signature to an image independent of size of signature capture, without 
- the decorations. Just like the backend rendering would do.
+ the decorations. Just like the back-end rendering would do.
 
  20150126: This is the alpha/debug version of the code. 
  Some debugging code is still in place, the plugin attaches a visible canvas to a div in the DOM, 
  and the configuration is hard coded. These things will all be fixed. 
+
+ 20150202: Removed debugging code. Configuration may now be done from settings supplied when jSignature is initialized.
+ If the div RITest exist, the canvas will be appended to it and visible for testing. Otherwise the canvas will not be visible.
 */
-
-
-var render_size_x = 301;
-var render_size_y = 201;
 
 ;(function(){
 	'use strict'
@@ -129,23 +128,6 @@ mourner.github.com/simplify-js
 		this.getVectorFromPoint = function (point) {
 			return this.getVectorToPoint(point).reverse()
 		}
-	}
-
-	/**
-	Allows one to round a number to arbitrary precision.
-	Math.round() rounds to whole only.
-	Number.toFixed(precision) returns a string.
-	I need float to float, but with arbitrary precision, hence:
-
-	@public
-	@function
-	@param number {Number}
-	@param position {Number} number of digits right of decimal point to keep. If negative, rounding to the left of decimal.
-	@returns {Type}
-	*/
-	function round (number, position){
-		var tmp = Math.pow(10, position)
-		return Math.round( number * tmp ) / tmp
 	}
 
 	function segmentToCurve(stroke, positionInStroke, lineCurveThreshold){
@@ -319,10 +301,8 @@ mourner.github.com/simplify-js
 			, 2
 		);
 
-					//alert('dot spot');
-
 		}
-		return ('Hello World')
+		return []
 	}
 
 	function simplifystroke(stroke){
@@ -341,7 +321,7 @@ mourner.github.com/simplify-js
 		return newstroke
 	}
 
-	function drawImageOnCanvas(data, settings){
+	function drawImageOnCanvas(data, settings, imageType){
 		'use strict'
 		var i , l = data.length
 		, stroke
@@ -351,20 +331,42 @@ mourner.github.com/simplify-js
 		, sizey = 0
 		, shiftx = 0
 		, shifty = 0
-		, minx, maxx, miny, maxy, padding = 1
+		, minx, maxx, miny, maxy, padding = 5
 		, simplifieddata = []
 
-		canvasx.width = render_size_x;
-		canvasx.height = render_size_y;
-		canvasx.style.width = render_size_x;
-		canvasx.style.height = render_size_y;
+		var defaults = {
+		'RIwidth' : 300
+		,'RIheight' : 150
+		,'RIcolor' : '#000'
+		,'RIbackground-color-jpeg': '#fff'		
+		,'RIbackground-color-png': 'transparent'
+		,'RIlineWidth' : 3
+		}
 
-		canvasContext.lineWidth = 2;
+		settings = $.extend({}, defaults, settings);
+
+		var RIbackground_color = settings['RIbackground-color-jpeg'];
+
+		if (imageType == 'png'){
+			RIbackground_color = settings['RIbackground-color-png'];
+		}
+
+		var RIwidth = settings['RIwidth']
+			, RIheight = settings['RIheight']
+			, RIcolor = settings['RIcolor']
+			, RIlineWidth = settings['RIlineWidth']
+
+		canvasx.width = RIwidth;
+		canvasx.height = RIheight;
+		canvasx.style.width = RIwidth;
+		canvasx.style.height = RIheight;
+
+		canvasContext.lineWidth = RIlineWidth;
 	    canvasContext.lineCap = canvasContext.lineJoin = "round";
 
-		canvasContext.fillStyle = 'white';
+	    canvasContext.strokeStyle = RIcolor;
+		canvasContext.shadowColor = canvasContext.fillStyle = RIbackground_color;
 		canvasContext.fillRect(0, 0, canvasx.width, canvasx.height);
-
 		
 		if(l !== 0){
 			for(i = 0; i < l; i++){
@@ -387,7 +389,7 @@ mourner.github.com/simplify-js
 		
 		// Normalize and scale stroke data
 		if(sizex > 0 && sizey > 0){
-			var scaleFactor = Math.min(render_size_x / sizex, render_size_y / sizey);
+			var scaleFactor = Math.min(RIwidth / sizex, RIheight / sizey);
 
 			for(i = 0, l = simplifieddata.length; i < l; i++){
 				stroke = simplifieddata[i]
@@ -403,7 +405,7 @@ mourner.github.com/simplify-js
 			stroke = simplifieddata[i]
 			drawstroke(stroke);
 		}
-		return('This could be data')
+		return []
 	}
 
 	if (typeof btoa !== 'function')
@@ -454,13 +456,13 @@ http://phpjs.org/functions/base64_encode
 	}
 
 	function renderBase64JPEG(data, settings){
-		drawImageOnCanvas(data, settings);
+		drawImageOnCanvas(data, settings, 'jpeg');
 		var splitData = canvasx.toDataURL('image/jpeg').split(',');
 		return(splitData);
 	}
 
 	function renderBase64PNG(data, settings){
-		drawImageOnCanvas(data, settings);
+		drawImageOnCanvas(data, settings, 'png');
 		var splitData = canvasx.toDataURL('image/png').split(',');
 		return(splitData);
 	}
@@ -502,13 +504,11 @@ http://phpjs.org/functions/base64_encode
 			,getBase64encodedPNG
 		)
 
-		//alert ('Hello World');
-		//$("#RITest").append("<p>zzzTest01</p>");
-		//$("<p>zzzTest02</p>").appendTo("#RITest");
-
 			canvasx = document.createElement('canvas')
 			var $canvas = $(canvasx);
-			$canvas.appendTo('#RITest');
+			if($('#RITest').length){
+				$canvas.appendTo('#RITest')
+			};
 			$canvas.attr('id', 'CompressorRenderImageID')
 			$canvas.addClass('CompressorRenderImageClass');
 			canvasContext = canvasx.getContext("2d");
